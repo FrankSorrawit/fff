@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Flow Builder</title>
-  <link rel="stylesheet" href="https://unpkg.com/reactflow@11/dist/style.css" />
+  <link rel="stylesheet" href="/static/reactflow.min.css" />
   <style>
     html, body, #root { height: 100%; margin: 0; }
     button { z-index: 10; }
@@ -11,10 +11,13 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="module">
-    import React, { useCallback } from 'https://esm.sh/react@18';
-    import { createRoot } from 'https://esm.sh/react-dom@18/client';
-    import ReactFlow, { Background, Controls, MiniMap, addEdge, useNodesState, useEdgesState } from 'https://esm.sh/reactflow@11';
+  <script src="/static/react.production.min.js"></script>
+  <script src="/static/react-dom.production.min.js"></script>
+  <script src="/static/reactflow.min.js"></script>
+  <script>
+    const { useCallback } = React;
+    const { createRoot } = ReactDOM;
+    const { ReactFlow: ReactFlowComponent, Background, Controls, MiniMap, addEdge, useNodesState, useEdgesState } = ReactFlow;
 
     const initialNodes = [
       { id: 'n1', type: 'input', position: { x: 0, y: 50 }, data: { label: 'Input' } },
@@ -49,7 +52,7 @@
 
       return (
         React.createElement('div', { style: { height: '100%' } },
-          React.createElement(ReactFlow, { nodes, edges, onNodesChange, onEdgesChange, onConnect, fitView: true },
+          React.createElement(ReactFlowComponent, { nodes, edges, onNodesChange, onEdgesChange, onConnect, fitView: true },
             React.createElement(Background, null),
             React.createElement(Controls, null),
             React.createElement(MiniMap, null)
