@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Flow Builder</title>
+  <link rel="stylesheet" href="https://unpkg.com/reactflow@11/dist/style.css" />
+  <style>
+    html, body, #root { height: 100%; margin: 0; }
+    button { z-index: 10; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module">
+    import React, { useCallback } from 'https://esm.sh/react@18';
+    import { createRoot } from 'https://esm.sh/react-dom@18/client';
+    import ReactFlow, { Background, Controls, MiniMap, addEdge, useNodesState, useEdgesState } from 'https://esm.sh/reactflow@11';
+
+    const initialNodes = [
+      { id: 'n1', type: 'input', position: { x: 0, y: 50 }, data: { label: 'Input' } },
+      { id: 'n2', position: { x: 250, y: 50 }, data: { label: 'llm.chat' } },
+      { id: 'n3', type: 'output', position: { x: 500, y: 50 }, data: { label: 'Output' } }
+    ];
+    const initialEdges = [
+      { id: 'e1-2', source: 'n1', target: 'n2' },
+      { id: 'e2-3', source: 'n2', target: 'n3' }
+    ];
+
+    function FlowEditor() {
+      const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+      const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+      const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+
+      const exportFlow = () => {
+        const flow = {
+          name: 'Demo Flow',
+          nodes: nodes.map((n) => ({ id: n.id, type: n.data.label, params: {} })),
+          edges: edges.map((e) => ({ from: e.source, to: e.target }))
+        };
+        fetch('/api/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(flow)
+        })
+          .then((r) => r.json())
+          .then((r) => alert(JSON.stringify(r, null, 2)))
+          .catch((err) => alert(err));
+      };
+
+      return (
+        React.createElement('div', { style: { height: '100%' } },
+          React.createElement(ReactFlow, { nodes, edges, onNodesChange, onEdgesChange, onConnect, fitView: true },
+            React.createElement(Background, null),
+            React.createElement(Controls, null),
+            React.createElement(MiniMap, null)
+          ),
+          React.createElement('button', { style: { position: 'absolute', right: 10, top: 10 }, onClick: exportFlow }, 'Validate')
+        )
+      );
+    }
+
+    const root = createRoot(document.getElementById('root'));
+    root.render(React.createElement(FlowEditor));
+  </script>
+</body>
+</html>
